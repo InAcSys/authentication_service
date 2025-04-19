@@ -1,0 +1,28 @@
+services:
+  authentication-service:
+    build: .
+    env_file: .env
+    extra_hosts:
+      - "localhost:host-gateway"
+    ports:
+      - "${AUTHENTICATION_SERVICE_APP_PORT}:80"
+    depends_on:
+      - authentication-service-db
+    networks:
+      - authentication-service-net
+    restart: unless-stopped
+
+
+  authentication-service-db:
+    image: mongo:6.0
+    container_name: mongo
+    ports:
+      - "${AUTHENTICATION_SERVICE_DB_PORT}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${AUTHENTICATION_SERVICE_DATABASE_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${AUTHENTICATION_SERVICE_DATABASE_PASSWORD}
+    networks:
+      - authentication-service-net
+
+networks:
+  authentication-service-net:
