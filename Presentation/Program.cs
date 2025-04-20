@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using AuthenticationService.Presentation.Configuration;
 using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,7 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddConfiguration();
 builder.Services.AddControllers()
         .AddJsonOptions(options =>
         {
@@ -21,7 +23,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocalhost", policy =>
+    options.AddPolicy("AllowAnyOrigin", policy =>
     {
         policy.AllowAnyOrigin()
               .AllowAnyHeader()
@@ -36,6 +38,6 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
-app.UseCors("AllowLocalhost");
+app.UseCors("AllowAnyOrigin");
 app.MapControllers();
 app.Run();
