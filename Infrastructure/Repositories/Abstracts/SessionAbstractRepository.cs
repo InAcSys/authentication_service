@@ -1,9 +1,11 @@
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using AuthenticationService.Domain.DTOs;
 using AuthenticationService.Domain.Entities.Concretes;
 using AuthenticationService.Infrastructure.Repositories.Interfaces;
 using AuthenticationService.Infrastructure.Utils;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 namespace AuthenticationService.Infrastructure.Repositories.Abstracts
 {
@@ -31,16 +33,17 @@ namespace AuthenticationService.Infrastructure.Repositories.Abstracts
             var response = await httpClient.PostAsync(url, content);
             var responseBody = await response.Content.ReadAsStringAsync();
 
-            if (!response.IsSuccessStatusCode)
+            if (response.StatusCode is HttpStatusCode.Unauthorized)
             {
-                throw new ArgumentException("Invalid response");
+                throw new UnauthorizedAccessException("Invalid auth response");
             }
 
             var authResponse = JsonSerializer.Deserialize<AuthResponseDTO>(responseBody);
+            Console.WriteLine($"{authResponse?.UserId} - {authResponse?.RoleId}");
 
             if (authResponse is null)
             {
-                throw new ArgumentException("Invalid auth response");
+                throw new ArgumentException("Resource not found");
             }
 
             var session = new Session

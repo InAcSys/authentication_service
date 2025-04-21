@@ -15,8 +15,19 @@ namespace AuthenticationService.Presentation.Controllers
         [HttpPost("log-in")]
         public async Task<IActionResult> LogIn([FromBody] LogInDTO logIn)
         {
-            var result = await _service.LogIn(logIn);
-            return Ok(result);
+            try
+            {
+                var result = await _service.LogIn(logIn);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                return Unauthorized(new { message = exception.Message });
+            }
+            catch (ArgumentException exception)
+            {
+                return NotFound(new { message = exception.Message });
+            }
         }
     }
 }
