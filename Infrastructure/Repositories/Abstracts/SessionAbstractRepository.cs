@@ -33,17 +33,21 @@ namespace AuthenticationService.Infrastructure.Repositories.Abstracts
             var response = await httpClient.PostAsync(url, content);
             var responseBody = await response.Content.ReadAsStringAsync();
 
-            if (response.StatusCode is HttpStatusCode.Unauthorized)
+            if (response.StatusCode is HttpStatusCode.Unauthorized || response.StatusCode is HttpStatusCode.InternalServerError)
             {
                 throw new UnauthorizedAccessException("Invalid auth response");
             }
 
-            var authResponse = JsonSerializer.Deserialize<AuthResponseDTO>(responseBody);
-            Console.WriteLine($"{authResponse?.UserId} - {authResponse?.RoleId}");
+            var authResponse = JsonSerializer.Deserialize<ResponseDTO>(responseBody);
 
             if (authResponse is null)
             {
                 throw new ArgumentException("Resource not found");
+            }
+
+            if (authResponse.Data is null)
+            {
+                throw new ArgumentException("User not exists");
             }
 
             var session = new Session
@@ -53,12 +57,12 @@ namespace AuthenticationService.Infrastructure.Repositories.Abstracts
                 Device = logIn.Device,
                 Browser = logIn.Browser,
                 Os = logIn.Os,
-                UserId = authResponse.UserId
+                UserId = authResponse.Data.UserId
             };
 
             await Create(session);
 
-            var jwt = Tokenizer.JWTGenerator(authResponse.UserId, authResponse.RoleId);
+            var jwt = Tokenizer.JWTGenerator(authResponse.Data.UserId, authResponse.Data.RoleId, authResponse.Data.TenantId);
 
             return jwt;
         }

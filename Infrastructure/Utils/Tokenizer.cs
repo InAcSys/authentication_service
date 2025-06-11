@@ -8,7 +8,7 @@ namespace AuthenticationService.Infrastructure.Utils
     public static class Tokenizer
     {
         private readonly static string _secretKey = Environment.GetEnvironmentVariable("SECRET_KEY_JWT") ?? "";
-        public static string JWTGenerator(Guid userId, int roleId)
+        public static string JWTGenerator(Guid userId, int roleId, Guid tenantId)
         {
             if (string.IsNullOrEmpty(_secretKey))
             {
@@ -22,6 +22,7 @@ namespace AuthenticationService.Infrastructure.Utils
             {
                 new Claim("UserId", userId.ToString()),
                 new Claim("RoleId", roleId.ToString()),
+                new Claim("TenantId", tenantId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
             };

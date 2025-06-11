@@ -8,5 +8,7 @@ namespace AuthenticationService.Domain.DTOs
         public Guid UserId { get; set; }
         [JsonPropertyName("roleId")]
         public int RoleId { get; set; }
+        [JsonPropertyName("tenantId")]
+        public Guid TenantId { get; set; }
     }
 }

@@ -6,5 +6,6 @@ namespace AuthenticationService.Application.Services.Interfaces
     public interface ILogInService : IService<Session, Guid>
     {
         Task<string> LogIn(LogInDTO logIn);
+        JWTValidateDTO Validate(string jwt);
     }
 }
